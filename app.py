@@ -1,6 +1,6 @@
 from flask import Flask, request, render_template, jsonify
 import json
-from openai import AzureOpenAI 
+from openai import AzureOpenAI
 
 app = Flask(__name__)
 
@@ -32,4 +32,4 @@ def chat():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", debug=False)

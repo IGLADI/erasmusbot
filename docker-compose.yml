@@ -1,0 +1,16 @@
+services:
+    erasmusbot:
+        container_name: erasmusbot
+        build:
+            context: .
+        volumes:
+            - .:/app
+        environment:
+            FLASK_ENV: production
+        networks:
+            - cloud
+        restart: always
+
+networks:
+    cloud:
+        external: true
