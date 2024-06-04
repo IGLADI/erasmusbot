@@ -1,16 +1,19 @@
+networks:
+    cloud:
+        name: cloud
+        driver: bridge
+
 services:
     erasmusbot:
         container_name: erasmusbot
         build:
-            context: .
+            context: ./erasmusbot
         volumes:
-            - .:/app
+            - ./erasmusbot:/app
         environment:
             FLASK_ENV: production
+        ports:
+            - "5000:5000"
         networks:
             - cloud
         restart: always
-
-networks:
-    cloud:
-        external: true
