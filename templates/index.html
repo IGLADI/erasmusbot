@@ -29,30 +29,18 @@
             if (response.ok) {
                 document.getElementById("loginContainer").style.display = "none";
                 document.getElementById("chatContainer").style.display = "block";
+                const data = await response.json();
+                const oldMessages = data.old_messages;
+                const chatLog = document.getElementById("chatLog");
+                oldMessages.forEach(message => {
+                    if (message.role === "user") {
+                        chatLog.innerHTML += `<p><b>You:</b> ${message.content}</p>`;
+                    } else {
+                        chatLog.innerHTML += `<p><b>ErasmusBot:</b> ${message.content}</p>`;
+                    }
+                });
             } else {
                 document.getElementById("loginError").style.display = "block";
-            }
-        }
-
-        async function register() {
-            const username = document.getElementById("username").value;
-            const password = document.getElementById("password").value;
-            const response = await fetch("/register", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ username: username, password: password }),
-            });
-
-            if (response.ok) {
-                document.getElementById("registerSuccess").style.display = "block";
-                document.getElementById("registerError").style.display = "none";
-            } else {
-                const data = await response.json();
-                document.getElementById("registerError").innerText = data.message;
-                document.getElementById("registerError").style.display = "block";
-                document.getElementById("registerSuccess").style.display = "none";
             }
         }
 

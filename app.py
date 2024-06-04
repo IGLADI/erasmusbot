@@ -18,16 +18,23 @@ client = AzureOpenAI(
     api_version="2024-02-01",
 )
 
-conversation = []
-
 # Hardcoded credentials (in a real application, use a database)
 users = {"user1": "password1"}
+
+# Dictionary to store conversations based on user
+conversations = {}
 
 
 @app.route("/")
 def index():
     if "username" in session:
-        return render_template("index.html")
+        # If the user is logged in, retrieve old messages from session or conversations
+        old_messages = session.pop("old_messages", [])
+        if not old_messages:
+            username = session["username"]
+            old_messages = conversations.get(username, [])
+        conversation_log = conversation + old_messages
+        return render_template("index.html", conversation_log=conversation_log)
     return redirect(url_for("login"))
 
 
@@ -38,7 +45,8 @@ def login():
         password = request.json.get("password")
         if username in users and users[username] == password:
             session["username"] = username
-            return jsonify({"success": True}), 200
+            old_messages = conversations.get(username, [])
+            return jsonify({"success": True, "old_messages": old_messages}), 200
         return jsonify({"success": False}), 401
     return render_template("index.html")
 
@@ -48,8 +56,13 @@ def chat():
     if "username" not in session:
         return jsonify({"error": "Unauthorized"}), 401
 
-    global conversation
     user_message = request.json.get("message")
+    username = session["username"]
+
+    if username not in conversations:
+        conversations[username] = []
+
+    conversation = conversations[username]
     conversation.append({"role": "user", "content": user_message})
 
     response = client.chat.completions.create(
@@ -78,13 +91,21 @@ def chat():
 
     system_response = response.choices[0].message.content
     conversation.append({"role": "assistant", "content": system_response})
+    print(conversation)
+    conversations[username] = conversation  # Update conversation in the dictionary
 
     return jsonify({"response": system_response})
 
 
 @app.route("/logout")
 def logout():
-    session.pop("username", None)
+    # Get the username from the session
+    username = session.get("username")
+    # If username exists in the session, store old messages and then remove the username
+    if username:
+        old_messages = conversations.get(username, [])
+        session["old_messages"] = old_messages
+        session.pop("username")
     return redirect(url_for("login"))
 
 
