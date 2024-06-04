@@ -7,9 +7,9 @@ services:
     erasmusbot:
         container_name: erasmusbot
         build:
-            context: ./erasmusbot
+            context: ./
         volumes:
-            - ./erasmusbot:/app
+            - ./:/app
         environment:
             FLASK_ENV: production
         ports:
