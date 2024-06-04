@@ -21,7 +21,7 @@ client = AzureOpenAI(
 conversation = []
 
 # Hardcoded credentials (in a real application, use a database)
-users = {"user1": "password1", "user2": "password2"}
+users = {"user1": "password1"}
 
 
 @app.route("/")
@@ -41,16 +41,6 @@ def login():
             return jsonify({"success": True}), 200
         return jsonify({"success": False}), 401
     return render_template("index.html")
-
-
-@app.route("/register", methods=["POST"])
-def register():
-    username = request.json.get("username")
-    password = request.json.get("password")
-    if username in users:
-        return jsonify({"success": False, "message": "User already exists"}), 409
-    users[username] = password
-    return jsonify({"success": True}), 201
 
 
 @app.route("/chat", methods=["POST"])
