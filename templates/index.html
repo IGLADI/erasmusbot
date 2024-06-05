@@ -30,7 +30,7 @@
                 document.getElementById("loginContainer").style.display = "none";
                 document.getElementById("chatContainer").style.display = "block";
                 const data = await response.json();
-                const oldMessages = data.old_messages;
+                const oldMessages = await data.old_messages;
                 const chatLog = document.getElementById("chatLog");
                 chatLog.innerHTML = "";  // Clear the chat log
                 oldMessages.forEach(message => {

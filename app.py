@@ -89,6 +89,9 @@ def chat():
     conversation.append({"role": "assistant", "content": system_response})
     conversations[username] = conversation  # Update conversation in the dictionary
 
+    old_messages = conversations.get(username, [])
+    session["old_messages"] = old_messages
+
     return jsonify({"response": system_response})
 
 
@@ -98,8 +101,6 @@ def logout():
     username = session.get("username")
     # If username exists in the session, store old messages and then remove the username
     if username:
-        old_messages = conversations.get(username, [])
-        session["old_messages"] = old_messages
         session.pop("username")
     return redirect(url_for("login"))
 
