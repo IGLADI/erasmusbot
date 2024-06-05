@@ -28,13 +28,9 @@ conversations = {}
 @app.route("/")
 def index():
     if "username" in session:
-        # If the user is logged in, retrieve old messages from session or conversations
-        old_messages = session.pop("old_messages", [])
-        if not old_messages:
-            username = session["username"]
-            old_messages = conversations.get(username, [])
-        conversation_log = conversation + old_messages
-        return render_template("index.html", conversation_log=conversation_log)
+        username = session["username"]
+        old_messages = conversations.get(username, [])
+        return render_template("index.html", conversation_log=old_messages)
     return redirect(url_for("login"))
 
 
@@ -91,7 +87,6 @@ def chat():
 
     system_response = response.choices[0].message.content
     conversation.append({"role": "assistant", "content": system_response})
-    print(conversation)
     conversations[username] = conversation  # Update conversation in the dictionary
 
     return jsonify({"response": system_response})

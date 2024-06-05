@@ -32,6 +32,7 @@
                 const data = await response.json();
                 const oldMessages = data.old_messages;
                 const chatLog = document.getElementById("chatLog");
+                chatLog.innerHTML = "";  // Clear the chat log
                 oldMessages.forEach(message => {
                     if (message.role === "user") {
                         chatLog.innerHTML += `<p><b>You:</b> ${message.content}</p>`;
