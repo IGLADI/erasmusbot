@@ -23,7 +23,13 @@ users = {"user1": "password1"}
 
 # Dictionary to store conversations based on user
 conversations = {}
-
+@app.route("/clear_chat", methods=["POST"])
+def clear_chat():
+    if "username" in session:
+        username = session["username"]
+        conversations[username] = []  # Clear conversation for the user
+        return jsonify({"success": True}), 200
+    return jsonify({"error": "Unauthorized"}), 401
 
 @app.route("/")
 def index():
