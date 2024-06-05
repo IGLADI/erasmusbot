@@ -80,9 +80,8 @@
         function speak(text) {
             const synth = window.speechSynthesis;
             const voices = synth.getVoices();
-            const englishVoice = voices.find(voice => voice.lang === 'en-US'); // Find English voice
             const utterance = new SpeechSynthesisUtterance(text);
-            utterance.voice = englishVoice; // Set the voice to English
+            utterance.lang = 'en-US'; // Set the voice to English
             synth.speak(utterance);
         }
         
