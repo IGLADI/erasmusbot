@@ -15,6 +15,15 @@
         }
     </style>
     <script>
+        let isMuted = false;
+        let spokenMessages = [];
+        
+        function toggleMute() {
+            isMuted = !isMuted;
+            const muteButton = document.getElementById("muteButton");
+            muteButton.innerText = isMuted ? "Unmute" : "Mute";
+        }
+        
         async function login() {
             const username = document.getElementById("username").value;
             const password = document.getElementById("password").value;
@@ -25,8 +34,9 @@
                 },
                 body: JSON.stringify({ username: username, password: password }),
             });
-    
+        
             if (response.ok) {
+                spokenMessages = []; // Clear the spokenMessages array
                 document.getElementById("loginContainer").style.display = "none";
                 document.getElementById("chatContainer").style.display = "block";
                 const data = await response.json();
@@ -38,14 +48,13 @@
                         chatLog.innerHTML += `<p><b>You:</b> ${message.content}</p>`;
                     } else {
                         chatLog.innerHTML += `<p><b>ErasmusBot:</b> ${message.content}</p>`;
-                        speak(message.content); // Add text-to-speech for bot messages
                     }
                 });
             } else {
                 document.getElementById("loginError").style.display = "block";
             }
         }
-    
+        
         async function sendMessage() {
             const sendButton = document.getElementById("sendButton");
             const userInput = document.getElementById("userInput");
@@ -60,22 +69,27 @@
             });
             const data = await response.json();
             document.getElementById("chatLog").innerHTML += `<p><b>You:</b> ${message}</p><p><b>ErasmusBot:</b> ${data.response}</p>`;
-            speak(data.response); // Add text-to-speech for bot responses
+            if (!isMuted) {
+                speak(data.response); // Add text-to-speech for bot responses if not muted
+            }
             userInput.value = "";
             sendButton.disabled = false;
         }
-    
+        
         function speak(text) {
             const synth = window.speechSynthesis;
+            const voices = synth.getVoices();
+            const englishVoice = voices.find(voice => voice.lang === 'en-US'); // Find English voice
             const utterance = new SpeechSynthesisUtterance(text);
+            utterance.voice = englishVoice; // Set the voice to English
             synth.speak(utterance);
         }
-    
+        
         function logout() {
             window.location.href = "/logout";
         }
     </script>
-    
+
 </head>
 <body>
     <div class="container d-flex justify-content-center align-items-center vh-100">
@@ -99,6 +113,7 @@
                     <div class="input-group mb-3">
                         <input type="text" id="userInput" class="form-control" placeholder="Type your message here" />
                         <button id="sendButton" class="btn btn-primary" type="button" onclick="sendMessage()">Send</button>
+                        <button id="muteButton" class="btn btn-secondary" type="button" onclick="toggleMute()">Mute</button>
                     </div>
                     <div id="chatLog" class="border rounded p-3 mb-3"></div>
                     <button class="btn btn-danger" type="button" onclick="logout()">Logout</button>
