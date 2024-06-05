@@ -3,7 +3,7 @@ import json
 from openai import AzureOpenAI
 
 app = Flask(__name__)
-app.secret_key = "your_secret_key"  # Needed for session management
+app.secret_key = "secret_key@#123456789" 
 
 with open("ChatSetup.json", "r") as file:
     chat_setup = json.load(file)
@@ -17,17 +17,14 @@ client = AzureOpenAI(
     api_key=chat_setup["api_key"],
     api_version="2024-02-01",
 )
+users = {chat_setup["username"]:chat_setup["password"]}
 
-# Hardcoded credentials (in a real application, use a database)
-users = {"user1": "password1"}
-
-# Dictionary to store conversations based on user
 conversations = {}
 @app.route("/clear_chat", methods=["POST"])
 def clear_chat():
     if "username" in session:
         username = session["username"]
-        conversations[username] = []  # Clear conversation for the user
+        conversations[username] = []
         return jsonify({"success": True}), 200
     return jsonify({"error": "Unauthorized"}), 401
 
@@ -93,7 +90,7 @@ def chat():
 
     system_response = response.choices[0].message.content
     conversation.append({"role": "assistant", "content": system_response})
-    conversations[username] = conversation  # Update conversation in the dictionary
+    conversations[username] = conversation  
 
     old_messages = conversations.get(username, [])
     session["old_messages"] = old_messages
@@ -103,9 +100,8 @@ def chat():
 
 @app.route("/logout")
 def logout():
-    # Get the username from the session
     username = session.get("username")
-    # If username exists in the session, store old messages and then remove the username
+
     if username:
         session.pop("username")
     return redirect(url_for("login"))
