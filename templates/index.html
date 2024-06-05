@@ -22,6 +22,7 @@
             isMuted = !isMuted;
             const muteButton = document.getElementById("muteButton");
             muteButton.innerText = isMuted ? "Unmute" : "Mute";
+            window.speechSynthesis.cancel()
         }
         
         async function login() {
