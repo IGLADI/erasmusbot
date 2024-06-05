@@ -25,7 +25,7 @@
                 },
                 body: JSON.stringify({ username: username, password: password }),
             });
-
+    
             if (response.ok) {
                 document.getElementById("loginContainer").style.display = "none";
                 document.getElementById("chatContainer").style.display = "block";
@@ -38,13 +38,14 @@
                         chatLog.innerHTML += `<p><b>You:</b> ${message.content}</p>`;
                     } else {
                         chatLog.innerHTML += `<p><b>ErasmusBot:</b> ${message.content}</p>`;
+                        speak(message.content); // Add text-to-speech for bot messages
                     }
                 });
             } else {
                 document.getElementById("loginError").style.display = "block";
             }
         }
-
+    
         async function sendMessage() {
             const sendButton = document.getElementById("sendButton");
             const userInput = document.getElementById("userInput");
@@ -59,14 +60,22 @@
             });
             const data = await response.json();
             document.getElementById("chatLog").innerHTML += `<p><b>You:</b> ${message}</p><p><b>ErasmusBot:</b> ${data.response}</p>`;
+            speak(data.response); // Add text-to-speech for bot responses
             userInput.value = "";
             sendButton.disabled = false;
         }
-
+    
+        function speak(text) {
+            const synth = window.speechSynthesis;
+            const utterance = new SpeechSynthesisUtterance(text);
+            synth.speak(utterance);
+        }
+    
         function logout() {
             window.location.href = "/logout";
         }
     </script>
+    
 </head>
 <body>
     <div class="container d-flex justify-content-center align-items-center vh-100">
