@@ -62,7 +62,12 @@ def register():
             return jsonify({"success": False, "error": "Username already exists"}), 409
 
         users[username] = password
-        return jsonify({"success": True}), 201
+
+        # Log in the user after successful registration
+        session["username"] = username
+
+        # Redirect to the chat screen
+        return redirect(url_for("index"))
 
     # Return a response even if the method is not POST
     return jsonify({"success": False, "error": "Method not allowed"}), 405

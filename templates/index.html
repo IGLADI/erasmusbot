@@ -93,10 +93,14 @@
                 },
                 body: JSON.stringify({ master_password: masterPassword, username: username, password: password }),
             });
-
+        
             if (response.ok) {
-                document.getElementById("registerSuccess").style.display = "block";
-                document.getElementById("registerError").style.display = "none";
+                // Redirect to the chat screen
+                window.location.href = "/"; // Assuming "/" redirects to the chat screen
+                
+                // Optionally, you can display a success message here before redirecting
+                // const successMessage = "You have successfully registered! Redirecting to the chat screen...";
+                // alert(successMessage);
             } else {
                 const data = await response.json();
                 document.getElementById("registerError").innerText = data.error || "Registration failed";
@@ -104,6 +108,7 @@
                 document.getElementById("registerSuccess").style.display = "none";
             }
         }
+        
 
         function showRegisterForm() {
             document.getElementById("loginContainer").style.display = "none";
@@ -152,15 +157,15 @@
                     <div id="registerError" class="alert alert-danger"></div>
                     <div id="registerSuccess" class="alert alert-success">Registration successful. Please log in.</div>
                     <div class="input-group mb-3">
-                        <input type="password" id="masterPassword" class="form-control" placeholder="Master Password" />
-                    </div>
-                    <div class="input-group mb-3">
                         <input type="text" id="registerUsername" class="form-control" placeholder="Username" />
-                    </div>
-                    <div class="input-group mb-3">
-                        <input type="password" id="registerPassword" class="form-control" placeholder="Password" />
-                    </div>
-                    <button class="btn btn-primary" type="button" onclick="register()">Register</button>
+                        </div>
+                        <div class="input-group mb-3">
+                            <input type="password" id="registerPassword" class="form-control" placeholder="Password" />
+                            </div>
+                        <div class="input-group mb-3">
+                            <input type="password" id="masterPassword" class="form-control" placeholder="Master Password" />
+                        </div>
+                            <button class="btn btn-primary" type="button" onclick="register()">Register</button>
                     <div class="mt-4">
                         <a href="#" class="btn btn-link" onclick="showLoginForm()">Back to Login</a>
                     </div>
