@@ -68,7 +68,6 @@ def register():
     return jsonify({"success": False, "error": "Method not allowed"}), 405
 
 
-
 @app.route("/chat", methods=["POST"])
 def chat():
     if "username" not in session:
@@ -116,14 +115,15 @@ def chat():
 
     return jsonify({"response": system_response})
 
-@app.route("/logout", methods=["GET", "POST"])  # Allow both GET and POST methods
+@app.route("/logout", methods=["GET", "POST"])
 def logout():
-    if request.method == "POST":
+    if request.method == "POST" or request.method == "GET":  # Corrected the condition here
         username = session.get("username")
         if username:
             session.pop("username")
-        return redirect(url_for("login"))  # Redirect to login after logout
-    return jsonify({"error": "Method not allowed"}), 405  # Return error for unsupported methods
+        return redirect(url_for("index"))  # Redirect to the index/login page
+    return jsonify({"error": "Method not allowed"}), 405
+
 
 
 if __name__ == "__main__":
