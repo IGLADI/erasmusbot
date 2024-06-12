@@ -6,11 +6,10 @@
     <title>Chat with ErasmusBot</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
     <style>
-        #chatLog {
-            max-height: 300px;
-            overflow-y: auto;
+        #registerError, #registerSuccess {
+            display: none;
         }
-        #chatContainer, #loginError, #registerError, #registerSuccess {
+        #registerContainer {
             display: none;
         }
     </style>
@@ -24,7 +23,6 @@
             muteButton.innerText = isMuted ? "Unmute" : "Mute";
             window.speechSynthesis.cancel()
         }
-        
         async function login() {
             const username = document.getElementById("username").value;
             const password = document.getElementById("password").value;
@@ -35,27 +33,16 @@
                 },
                 body: JSON.stringify({ username: username, password: password }),
             });
-        
+
             if (response.ok) {
-                spokenMessages = []; // Clear the spokenMessages array
-                document.getElementById("loginContainer").style.display = "none";
-                document.getElementById("chatContainer").style.display = "block";
                 const data = await response.json();
-                const oldMessages = await data.old_messages;
-                const chatLog = document.getElementById("chatLog");
-                chatLog.innerHTML = "";  // Clear the chat log
-                oldMessages.forEach(message => {
-                    if (message.role === "user") {
-                        chatLog.innerHTML += `<p><b>You:</b> ${message.content}</p>`;
-                    } else {
-                        chatLog.innerHTML += `<p><b>ErasmusBot:</b> ${message.content}</p>`;
-                    }
-                });
+                const oldMessages = data.old_messages || [];
+                showChat(oldMessages);
             } else {
                 document.getElementById("loginError").style.display = "block";
             }
         }
-        
+
         async function sendMessage() {
             const sendButton = document.getElementById("sendButton");
             const userInput = document.getElementById("userInput");
@@ -94,8 +81,49 @@
         function logout() {
             window.location.href = "/logout";
         }
-    </script>
+        
+        async function register() {
+            const masterPassword = document.getElementById("masterPassword").value;
+            const username = document.getElementById("registerUsername").value;
+            const password = document.getElementById("registerPassword").value;
+            const response = await fetch("/register", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ master_password: masterPassword, username: username, password: password }),
+            });
 
+            if (response.ok) {
+                document.getElementById("registerSuccess").style.display = "block";
+                document.getElementById("registerError").style.display = "none";
+            } else {
+                const data = await response.json();
+                document.getElementById("registerError").innerText = data.error || "Registration failed";
+                document.getElementById("registerError").style.display = "block";
+                document.getElementById("registerSuccess").style.display = "none";
+            }
+        }
+
+        function showRegisterForm() {
+            document.getElementById("loginContainer").style.display = "none";
+            document.getElementById("registerContainer").style.display = "block";
+        }
+
+        function showChat(oldMessages) {
+            document.getElementById("loginContainer").style.display = "none";
+            document.getElementById("chatContainer").style.display = "block";
+            const chatLog = document.getElementById("chatLog");
+            chatLog.innerHTML = "";  // Clear the chat log
+            oldMessages.forEach(message => {
+                if (message.role === "user") {
+                    chatLog.innerHTML += `<p><b>You:</b> ${message.content}</p>`;
+                } else {
+                    chatLog.innerHTML += `<p><b>ErasmusBot:</b> ${message.content}</p>`;
+                }
+            });
+        }
+    </script>
 </head>
 <body>
     <div class="container d-flex justify-content-center align-items-center vh-100">
@@ -111,10 +139,27 @@
                         <input type="password" id="password" class="form-control" placeholder="Password" />
                     </div>
                     <button class="btn btn-primary" type="button" onclick="login()">Login</button>
-                    <div id="registerError" class="alert alert-danger mt-3"></div>
-                    <div id="registerSuccess" class="alert alert-success mt-3">Registration successful. Please log in.</div>
+                    <button class="btn btn-secondary" type="button" onclick="showRegisterForm()">Register</button>
                 </div>
-                <div id="chatContainer">
+                <div id="registerContainer">
+                    <h1 class="card-title text-center mb-4">Register</h1>
+                    <div id="registerError" class="alert alert-danger"></div>
+                    <div id="registerSuccess" class="alert alert-success">Registration successful. Please log in.</div>
+                    <div class="input-group mb-3">
+                        <input type="password" id="masterPassword" class="form-control" placeholder="Master Password" />
+                    </div>
+                    <div class="input-group mb-3">
+                        <input type="text" id="registerUsername" class="form-control" placeholder="Username" />
+                    </div>
+                    <div class="input-group mb-3">
+                        <input type="password" id="registerPassword" class="form-control" placeholder="Password" />
+                    </div>
+                    <button class="btn btn-primary" type="button" onclick="register()">Register</button>
+                    <div class="mt-4">
+                        <a href="#" class="btn btn-link" onclick="showLoginForm()">Back to Login</a>
+                    </div>
+                </div>
+                <div id="chatContainer" style="display: none;">
                     <h1 class="card-title text-center mb-4">Chat with ErasmusBot</h1>
                     <div class="input-group mb-3">
                         <input type="text" id="userInput" class="form-control" placeholder="Type your message here" />
